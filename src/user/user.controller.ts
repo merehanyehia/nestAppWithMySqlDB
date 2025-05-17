@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -10,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -18,7 +21,7 @@ export class UserController {
   async findAllUsers(@Req() req: any, @Res() res: any) {
     try {
       const users = await this.userService.findAll();
-      res.json(users);
+      res.json({ users, total: users.length });
     } catch (err) {
       throw err;
     }
@@ -47,6 +50,36 @@ export class UserController {
   ) {
     try {
       const users = await this.userService.createUser(userData);
+      res.json(users);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  @Patch('/updateUser/:id')
+  async updateUser(
+    @Req() req: any,
+    @Res() res: any,
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    userData: UpdateUserDto,
+    @Param('id') userId: string,
+  ) {
+    try {
+      const users = await this.userService.updateUserData(userId, userData);
+      res.json(users);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  @Delete('/deleteUser')
+  async deleteUser(
+    @Req() req: any,
+    @Res() res: any,
+    @Body('userId') userId: string,
+  ) {
+    try {
+      const users = await this.userService.deleteUser(userId);
       res.json(users);
     } catch (err) {
       throw err;
